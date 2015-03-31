@@ -18,8 +18,8 @@ class LBP:
 
         # Calculate LBP for each non-edge pixel
         results = []
-        for i in range(1, height - 1):
-            for j in range(1, width - 1):
+        for i in xrange(1, height - 1):
+            for j in xrange(1, width - 1):
                 pixel = pixels[i][j]
 
                 # Compare this pixel to its neighbors, starting at the top-left
@@ -27,7 +27,8 @@ class LBP:
                 # update the feature vector
                 result = 0
                 neighbors = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
-                for index, neighbor in enumerate(neighbors):
+                for index in xrange(len(neighbors)):
+                    neighbor = neighbors[index]
                     if pixel > pixels[i + neighbor[0]][j + neighbor[1]]:
                         result = result | (1 << index)
 
@@ -37,8 +38,6 @@ class LBP:
         result_image = Image.new(image.mode, (width - 2, height - 2))
         result_image.putdata(results)
         result_image.save("output.png")
-        
-        return results
 
 def main(argv):
     filename = argv[0] if len(argv) > 0 else "input.png"
