@@ -41,12 +41,7 @@ class LBP:
 
 def main(argv):
     filename = argv[0] if len(argv) > 0 else "input.png"
-    verbose = argv[1] if len(argv) > 1 else True
    
-    # Make sure NumPy prints full arrays instead of shortened versions
-    if verbose:
-        np.set_printoptions(threshold=np.nan)
-    
     if os.path.isfile(filename):
         lbp = LBP(filename)
         lbp.process()
