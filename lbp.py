@@ -5,38 +5,32 @@ from PIL import Image
 
 class LBP:
     def __init__(self, filename):
-        self.image = Image.open(filename)
+        # Convert the image to grayscale
+        self.image = Image.open(filename).convert("L")
         self.width = self.image.size[0]
         self.height = self.image.size[1]
-        self.pixels = list(self.image.getdata())
         self.patterns = []
 
     def execute(self):
-        self._preprocess()
         self._process()
         self._output()
 
-    def _preprocess(self):
-        # Convert the image to grayscale
-        self.image = self.image.convert('L')
-
-        # Make pixels accessible like a 2D array (list of lists)
-        self.pixels = [self.pixels[i * self.width:(i + 1) * self.width] for i in xrange(self.height)]
-
     def _process(self):
+        pixels = list(self.image.getdata())
+        pixels = [pixels[i * self.width:(i + 1) * self.width] for i in xrange(self.height)]
+
         # Calculate LBP for each non-edge pixel
         neighbors = [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1)]
         for i in xrange(1, self.height - 1):
             for j in xrange(1, self.width - 1):
-                pixel = self.pixels[i][j]
+                pixel = pixels[i][j]
 
-                # Compare this pixel to its neighbors, starting at the top-left
-                # pixel and moving clockwise, and use bit operations to quickly
-                # update the feature vector
+                # Compare this pixel to its neighbors, starting at the top-left pixel and moving
+                # clockwise, and use bit operations to efficiently update the feature vector
                 pattern = 0
                 for index in xrange(len(neighbors)):
                     neighbor = neighbors[index]
-                    if pixel > self.pixels[i + neighbor[0]][j + neighbor[1]]:
+                    if pixel > pixels[i + neighbor[0]][j + neighbor[1]]:
                         pattern = pattern | (1 << index)
 
                 self.patterns.append(pattern)
