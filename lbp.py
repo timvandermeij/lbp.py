@@ -34,10 +34,11 @@ class LBP:
                 # Compare this pixel to its neighbors, starting at the top-left pixel and moving
                 # clockwise, and use bit operations to efficiently update the feature vector
                 pattern = 0
-                for index in xrange(len(neighbors)):
-                    neighbor = neighbors[index]
+                index = 0
+                for neighbor in neighbors:
                     if pixel > pixels[i + neighbor[0]][j + neighbor[1]]:
                         pattern = pattern | (1 << index)
+                    index += 1
 
                 self.patterns.append(pattern)
 
@@ -69,7 +70,7 @@ class Multiprocessing_LBP(LBP):
         if process_id == last_process_id:
             right_bound = self.height - 1
 
-        print("[{}] Processing segment with pixels {} to {}".format(process_id, left_bound, right_bound))
+        print("[{}] Started processing pixels {} to {}".format(process_id, left_bound, right_bound))
 
         # Calculate LBP for each non-edge pixel in the segment
         neighbors = [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1)]
@@ -81,22 +82,23 @@ class Multiprocessing_LBP(LBP):
                 # Compare this pixel to its neighbors, starting at the top-left pixel and moving
                 # clockwise, and use bit operations to efficiently update the feature vector
                 pattern = 0
-                for index in xrange(len(neighbors)):
-                    neighbor = neighbors[index]
+                index = 0
+                for neighbor in neighbors:
                     if pixel > pixels[i + neighbor[0]][j + neighbor[1]]:
                         pattern = pattern | (1 << index)
+                    index += 1
 
                 patterns.append(pattern)
 
         return_patterns[process_id] = patterns;
 
-        print("[{}] Processing done".format(process_id))
+        print("[{}] Done".format(process_id))
 
     def _distribute(self):
         # Collect return values from the processes
         manager = Manager()
         patterns = manager.dict()
-        for process_id in range(self.num_processes):
+        for process_id in xrange(self.num_processes):
             patterns[process_id] = []
 
         # Put the pixel array in shared memory for all processes
@@ -104,7 +106,7 @@ class Multiprocessing_LBP(LBP):
 
         # Spawn the processes
         processes = []
-        for process_id in range(self.num_processes):
+        for process_id in xrange(self.num_processes):
             process = Process(target=self._process, args=(process_id, pixels, patterns))
             processes.append(process)
             process.start()
@@ -114,7 +116,7 @@ class Multiprocessing_LBP(LBP):
 
         # Format the pixels correctly for the output function,
         # which expects a linear list of pixel values.
-        for process_id in range(self.num_processes):
+        for process_id in xrange(self.num_processes):
             self.patterns.extend(patterns[process_id])
 
 def main(argv):
