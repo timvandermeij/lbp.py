@@ -1,5 +1,5 @@
 # TODO:
-# - Multiprocessing could perhaps be made faster
+# - Multiprocessing could perhaps be made faster (OpenBLAS?)
 # - 5.jpg and 8.jpg have a strange black line at the bottom
 
 import sys
