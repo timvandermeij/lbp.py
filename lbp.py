@@ -41,6 +41,15 @@ class LBP:
         result_image.putdata(self.patterns)
         result_image.save("output.png")
 
+class Multiprocessing_LBP(LBP):
+    def __init__(self, filename, num_processes):
+        LBP.__init__(self, filename)
+        self.num_processes = num_processes
+
+    def _process(self):
+        # TODO: Do something here
+        print("Num processes: {}".format(self.num_processes))
+
 def main(argv):
     filename = argv[0] if len(argv) > 0 else "input.png"
     num_processes = int(argv[1]) if len(argv) > 1 else 1
@@ -53,7 +62,7 @@ def main(argv):
 
         lbp.execute()
     else:
-        print("File " + filename + " does not exist.")
+        print("File '{}' does not exist.".format(filename))
 
 if __name__ == "__main__":
     main(sys.argv[1:])
