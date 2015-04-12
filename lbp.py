@@ -1,8 +1,12 @@
+# TODO:
+# - Multiprocessing could perhaps be made faster
+# - 5.jpg and 8.jpg have a strange black line at the bottom
+
 import sys
 import os.path
 import numpy as np
 from PIL import Image
-from multiprocessing import Process
+from multiprocessing import Process, Manager
 import sharedmem
 
 class LBP:
@@ -52,25 +56,26 @@ class Multiprocessing_LBP(LBP):
         self._distribute()
         self._output()
 
-    def _process(self, process_id, pixels):
-        # Determine the width of the image segment to process
-        segment_width = int(np.floor(self.width / self.num_processes))
+    def _process(self, process_id, pixels, return_patterns):
+        # Determine the height of the image segment to process
+        segment_height = int(np.floor(self.height / self.num_processes))
         last_process_id = self.num_processes - 1
         if process_id == last_process_id:
-            segment_width = self.width - (last_process_id * segment_width)
+            segment_height = self.height - (last_process_id * segment_height)
 
         # Set the left and right bounds of the segment to process
-        left_bound = (process_id * segment_width) if process_id != 0 else 1
-        right_bound = (process_id * segment_width) + segment_width
+        left_bound = (process_id * segment_height) if process_id != 0 else 1
+        right_bound = (process_id * segment_height) + segment_height
         if process_id == last_process_id:
-            right_bound = self.width - 1
+            right_bound = self.height - 1
 
         print("[{}] Processing segment with pixels {} to {}".format(process_id, left_bound, right_bound))
 
         # Calculate LBP for each non-edge pixel in the segment
         neighbors = [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1)]
-        for i in xrange(1, self.height - 1):
-            for j in xrange(left_bound, right_bound):
+        patterns = []
+        for i in xrange(left_bound, right_bound):
+            for j in xrange(1, self.width - 1):
                 pixel = pixels[i][j]
 
                 # Compare this pixel to its neighbors, starting at the top-left pixel and moving
@@ -81,23 +86,36 @@ class Multiprocessing_LBP(LBP):
                     if pixel > pixels[i + neighbor[0]][j + neighbor[1]]:
                         pattern = pattern | (1 << index)
 
-                self.patterns.append(pattern)
+                patterns.append(pattern)
+
+        return_patterns[process_id] = patterns;
 
         print("[{}] Processing done".format(process_id))
 
     def _distribute(self):
+        # Collect return values from the processes
+        manager = Manager()
+        patterns = manager.dict()
+        for process_id in range(self.num_processes):
+            patterns[process_id] = []
+
         # Put the pixel array in shared memory for all processes
         pixels = sharedmem.copy(np.array(self.image))
 
         # Spawn the processes
         processes = []
         for process_id in range(self.num_processes):
-            process = Process(target=self._process, args=(process_id, pixels))
+            process = Process(target=self._process, args=(process_id, pixels, patterns))
             processes.append(process)
             process.start()
 
         # Wait for all processes to finish
         [process.join() for process in processes]
+
+        # Format the pixels correctly for the output function,
+        # which expects a linear list of pixel values.
+        for process_id in range(self.num_processes):
+            self.patterns.extend(patterns[process_id])
 
 def main(argv):
     filename = argv[0] if len(argv) > 0 else "input.png"
