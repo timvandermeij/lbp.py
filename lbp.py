@@ -2,6 +2,7 @@ import sys
 import os.path
 import numpy as np
 from PIL import Image
+from multiprocessing import Process, Manager
 
 class LBP:
     def __init__(self, filename):
@@ -46,9 +47,30 @@ class Multiprocessing_LBP(LBP):
         LBP.__init__(self, filename)
         self.num_processes = num_processes
 
-    def _process(self):
-        # TODO: Do something here
-        print("Num processes: {}".format(self.num_processes))
+    def execute(self):
+        self._distribute()
+        self._output()
+
+    def _process(self, process_id, pixels):
+        print("I am process {}".format(process_id))
+
+    def _distribute(self):
+        manager = Manager()
+
+        # Put the pixel array in shared memory for all processes
+        raw_pixels = list(self.image.getdata())
+        raw_pixels = [raw_pixels[i * self.width:(i + 1) * self.width] for i in xrange(self.height)]
+        pixels = manager.list(raw_pixels)
+
+        # Spawn the processes
+        processes = []
+        for process_id in range(self.num_processes):
+            process = Process(target=self._process, args=(process_id, pixels))
+            processes.append(process)
+            process.start()
+
+        # Wait for all processes to finish
+        [process.join() for process in processes]
 
 def main(argv):
     filename = argv[0] if len(argv) > 0 else "input.png"
