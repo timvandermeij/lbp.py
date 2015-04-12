@@ -2,7 +2,8 @@ import sys
 import os.path
 import numpy as np
 from PIL import Image
-from multiprocessing import Process, Manager
+from multiprocessing import Process
+import sharedmem
 
 class LBP:
     def __init__(self, filename):
@@ -52,15 +53,41 @@ class Multiprocessing_LBP(LBP):
         self._output()
 
     def _process(self, process_id, pixels):
-        print("I am process {}".format(process_id))
+        # Determine the width of the image segment to process
+        segment_width = int(np.floor(self.width / self.num_processes))
+        last_process_id = self.num_processes - 1
+        if process_id == last_process_id:
+            segment_width = self.width - (last_process_id * segment_width)
+
+        # Set the left and right bounds of the segment to process
+        left_bound = (process_id * segment_width) if process_id != 0 else 1
+        right_bound = (process_id * segment_width) + segment_width
+        if process_id == last_process_id:
+            right_bound = self.width - 1
+
+        print("[{}] Processing segment with pixels {} to {}".format(process_id, left_bound, right_bound))
+
+        # Calculate LBP for each non-edge pixel in the segment
+        neighbors = [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1)]
+        for i in xrange(1, self.height - 1):
+            for j in xrange(left_bound, right_bound):
+                pixel = pixels[i][j]
+
+                # Compare this pixel to its neighbors, starting at the top-left pixel and moving
+                # clockwise, and use bit operations to efficiently update the feature vector
+                pattern = 0
+                for index in xrange(len(neighbors)):
+                    neighbor = neighbors[index]
+                    if pixel > pixels[i + neighbor[0]][j + neighbor[1]]:
+                        pattern = pattern | (1 << index)
+
+                self.patterns.append(pattern)
+
+        print("[{}] Processing done".format(process_id))
 
     def _distribute(self):
-        manager = Manager()
-
         # Put the pixel array in shared memory for all processes
-        raw_pixels = list(self.image.getdata())
-        raw_pixels = [raw_pixels[i * self.width:(i + 1) * self.width] for i in xrange(self.height)]
-        pixels = manager.list(raw_pixels)
+        pixels = sharedmem.copy(np.array(self.image))
 
         # Spawn the processes
         processes = []
