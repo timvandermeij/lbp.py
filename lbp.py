@@ -70,9 +70,8 @@ class Multiprocessing_LBP(LBP):
         if process_id == last_process_id:
             right_bound = self.height - 1
 
-        print("[{}] Started processing pixels {} to {}".format(process_id, left_bound, right_bound))
-
         # Calculate LBP for each non-edge pixel in the segment
+        print("[{}] Started processing pixels {} to {}".format(process_id, left_bound, right_bound))
         neighbors = [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1)]
         patterns = []
         for i in xrange(left_bound, right_bound):
@@ -87,11 +86,10 @@ class Multiprocessing_LBP(LBP):
                     if pixel > pixels[i + neighbor[0]][j + neighbor[1]]:
                         pattern = pattern | (1 << index)
                     index += 1
-
+                
                 patterns.append(pattern)
 
         return_patterns[process_id] = patterns;
-
         print("[{}] Done".format(process_id))
 
     def _distribute(self):
