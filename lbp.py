@@ -12,7 +12,7 @@ from multiprocessing import Process, Manager
 import sharedmem
 
 class LBP:
-    def __init__(self, filename):
+    def __init__(self, filename, *ignore):
         # Convert the image to grayscale
         self.image = Image.open(filename).convert("L")
         self.width = self.image.size[0]
@@ -121,15 +121,22 @@ class Multiprocessing_LBP(LBP):
 
 def main(argv):
     filename = argv[0] if len(argv) > 0 else "input.png"
-    num_processes = int(argv[1]) if len(argv) > 1 else 1
+    algorithm = argv[1] if len(argv) > 1 else "lbp"
+    num_processes = int(argv[2]) if len(argv) > 2 else 1
+
+    algorithms = {
+        "lbp": LBP,
+        "multi-lbp": Multiprocessing_LBP
+    }
+    if algorithm not in algorithms:
+        print("Invalid algorithm '{}'".format(algorithm))
+        return
+
+    algorithm_class = algorithms[algorithm]
    
     if os.path.isfile(filename):
-        if num_processes == 1:
-            lbp = LBP(filename)
-        else:
-            lbp = Multiprocessing_LBP(filename, num_processes)
-
-        lbp.execute()
+        run = algorithm_class(filename, num_processes)
+        run.execute()
     else:
         print("File '{}' does not exist.".format(filename))
 
