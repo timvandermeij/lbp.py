@@ -114,6 +114,78 @@ class Multiprocessing_LBP(LBP):
         for process_id in xrange(self.num_processes):
             self.patterns.extend(patterns[process_id])
 
+class Multiprocessing_Split_LBP(Multiprocessing_LBP):
+    def __init__(self, filename, num_processes):
+        Multiprocessing_LBP.__init__(self, filename, num_processes)
+
+    def _process(self, process_id, pixels, return_patterns):
+        # Calculate LBP for each non-edge pixel in the segment
+        print("[{}] Started processing segment".format(process_id))
+        neighbors = [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1)]
+        patterns = []
+
+        left_bound = 0
+        if process_id == 0:
+            left_bound = 1
+        right_bound = pixels.shape[0] - 1
+        if process_id == (self.num_processes - 1):
+            right_bound -= 1
+        for i in xrange(left_bound, right_bound):
+            for j in xrange(1, self.width - 1):
+                pixel = pixels[i][j]
+
+                # Compare this pixel to its neighbors, starting at the top-left pixel and moving
+                # clockwise, and use bit operations to efficiently update the feature vector
+                pattern = 0
+                index = 0
+                for neighbor in neighbors:
+                    if pixel > pixels[i + neighbor[0]][j + neighbor[1]]:
+                        pattern = pattern | (1 << index)
+                    index += 1
+                
+                patterns.append(pattern)
+
+        return_patterns[process_id] = patterns;
+        print("[{}] Done".format(process_id))
+
+    def _distribute(self):
+        # Collect return values from the processes
+        manager = Manager()
+        patterns = manager.dict()
+        for process_id in xrange(self.num_processes):
+            patterns[process_id] = []
+
+        # Spawn the processes
+        pixels = np.array(self.image)
+        processes = []
+        for process_id in xrange(self.num_processes):
+            # Pass only the part of the image that the process needs to work with.
+            # This is done in order to make the processes work independently.
+            # Because of the neighborhood, each segment should partially overlap
+            # with the next and/or previous segment.
+            segment_height = int(np.floor(self.height / self.num_processes))
+            left_bound = process_id * segment_height
+            if process_id > 0:
+                left_bound -= 1
+            right_bound = (process_id * segment_height) + segment_height
+            if process_id == (self.num_processes - 1):
+                # The last process should also process any remaining rows
+                right_bound = self.height
+
+            # Start the process and pass only the pixels within the bounds
+            segment_pixels = pixels[left_bound:right_bound]
+            process = Process(target=self._process, args=(process_id, segment_pixels, patterns))
+            processes.append(process)
+            process.start()
+        
+        # Wait for all processes to finish
+        [process.join() for process in processes]
+
+        # Format the pixels correctly for the output function,
+        # which expects a linear list of pixel values.
+        for process_id in xrange(self.num_processes):
+            self.patterns.extend(patterns[process_id])
+
 def main(argv):
     filename = argv[0] if len(argv) > 0 else "input.png"
     algorithm = argv[1] if len(argv) > 1 else "lbp"
@@ -121,7 +193,8 @@ def main(argv):
 
     algorithms = {
         "lbp": LBP,
-        "multi-lbp": Multiprocessing_LBP
+        "multi-lbp": Multiprocessing_LBP,
+        "multi-split-lbp": Multiprocessing_Split_LBP
     }
     if algorithm not in algorithms:
         print("Invalid algorithm '{}'".format(algorithm))
