@@ -1,7 +1,5 @@
 # TODO:
-# - Multiprocessing could perhaps be made faster
-#   - OpenBLAS?
-#   - Pass relevant slice of pixel array to process instead of shared memory?
+# - Use OpenBLAS?
 
 import sys
 import os.path
