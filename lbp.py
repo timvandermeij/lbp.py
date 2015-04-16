@@ -1,5 +1,4 @@
-# TODO:
-# - Use OpenBLAS?
+# TODO: use OpenBLAS?
 
 import sys
 import os.path
