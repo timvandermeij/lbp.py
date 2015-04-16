@@ -2,7 +2,6 @@
 # - Multiprocessing could perhaps be made faster
 #   - OpenBLAS?
 #   - Pass relevant slice of pixel array to process instead of shared memory?
-# - 5.jpg and 8.jpg have a strange black line at the bottom
 
 import sys
 import os.path
@@ -60,16 +59,12 @@ class Multiprocessing_LBP(LBP):
         self._output()
 
     def _process(self, process_id, pixels, return_patterns):
-        # Determine the height of the image segment to process
-        segment_height = int(np.floor(self.height / self.num_processes))
-        last_process_id = self.num_processes - 1
-        if process_id == last_process_id:
-            segment_height = self.height - (last_process_id * segment_height)
-
         # Set the left and right bounds of the segment to process
+        segment_height = int(np.floor(self.height / self.num_processes))
         left_bound = (process_id * segment_height) if process_id != 0 else 1
         right_bound = (process_id * segment_height) + segment_height
-        if process_id == last_process_id:
+        if process_id == (self.num_processes - 1):
+            # The last process should also process any remaining rows
             right_bound = self.height - 1
 
         # Calculate LBP for each non-edge pixel in the segment
