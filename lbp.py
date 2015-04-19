@@ -1,4 +1,5 @@
 # TODO: use OpenBLAS?
+# TODO: avoid Managers as they are slow
 
 import sys
 import os.path
