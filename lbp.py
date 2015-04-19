@@ -158,6 +158,7 @@ class Multiprocessing_Split_LBP(Multiprocessing_LBP):
 
     def _distribute(self):
         pixels = np.array(self.image)
+        segment_height = int(np.floor(self.height / self.num_processes))
         processes = []
         queue = Queue()
         for process_id in xrange(self.num_processes):
@@ -165,7 +166,6 @@ class Multiprocessing_Split_LBP(Multiprocessing_LBP):
             # This is done in order to make the processes work independently.
             # Because of the neighborhood, each segment should partially overlap
             # with the next and/or previous segment.
-            segment_height = int(np.floor(self.height / self.num_processes))
             left_bound = process_id * segment_height
             if process_id > 0:
                 left_bound -= 1
