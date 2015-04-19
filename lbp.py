@@ -26,19 +26,23 @@ class LBP:
         # Calculate LBP for each non-edge pixel
         for i in xrange(1, self.height - 1):
             for j in xrange(1, self.width - 1):
-                pixel = pixels[i][j]
+                # Cache only the rows we need (within the neighborhood)
+                previous_row = pixels[i - 1]
+                current_row = pixels[i]
+                next_row = pixels[i + 1]
 
                 # Compare this pixel to its neighbors, starting at the top-left pixel and moving
                 # clockwise, and use bit operations to efficiently update the feature vector
+                pixel = current_row[j]
                 pattern = 0
-                pattern = pattern | (1 << 0) if pixel > pixels[i-1][j-1] else pattern
-                pattern = pattern | (1 << 1) if pixel > pixels[i-1][j] else pattern
-                pattern = pattern | (1 << 2) if pixel > pixels[i-1][j+1] else pattern
-                pattern = pattern | (1 << 3) if pixel > pixels[i][j+1] else pattern
-                pattern = pattern | (1 << 4) if pixel > pixels[i+1][j+1] else pattern
-                pattern = pattern | (1 << 5) if pixel > pixels[i+1][j] else pattern
-                pattern = pattern | (1 << 6) if pixel > pixels[i+1][j-1] else pattern
-                pattern = pattern | (1 << 7) if pixel > pixels[i][j-1] else pattern
+                pattern = pattern | (1 << 0) if pixel > previous_row[j-1] else pattern
+                pattern = pattern | (1 << 1) if pixel > previous_row[j] else pattern
+                pattern = pattern | (1 << 2) if pixel > previous_row[j+1] else pattern
+                pattern = pattern | (1 << 3) if pixel > current_row[j+1] else pattern
+                pattern = pattern | (1 << 4) if pixel > next_row[j+1] else pattern
+                pattern = pattern | (1 << 5) if pixel > next_row[j] else pattern
+                pattern = pattern | (1 << 6) if pixel > next_row[j-1] else pattern
+                pattern = pattern | (1 << 7) if pixel > current_row[j-1] else pattern
                 self.patterns.append(pattern)
 
     def _output(self):
@@ -69,21 +73,25 @@ class Multiprocessing_LBP(LBP):
         patterns = []
         for i in xrange(left_bound, right_bound):
             for j in xrange(1, self.width - 1):
-                pixel = pixels[i][j]
+                # Cache only the rows we need (within the neighborhood)
+                previous_row = pixels[i - 1]
+                current_row = pixels[i]
+                next_row = pixels[i + 1]
 
                 # Compare this pixel to its neighbors, starting at the top-left pixel and moving
                 # clockwise, and use bit operations to efficiently update the feature vector
+                pixel = current_row[j]
                 pattern = 0
-                pattern = pattern | (1 << 0) if pixel > pixels[i-1][j-1] else pattern
-                pattern = pattern | (1 << 1) if pixel > pixels[i-1][j] else pattern
-                pattern = pattern | (1 << 2) if pixel > pixels[i-1][j+1] else pattern
-                pattern = pattern | (1 << 3) if pixel > pixels[i][j+1] else pattern
-                pattern = pattern | (1 << 4) if pixel > pixels[i+1][j+1] else pattern
-                pattern = pattern | (1 << 5) if pixel > pixels[i+1][j] else pattern
-                pattern = pattern | (1 << 6) if pixel > pixels[i+1][j-1] else pattern
-                pattern = pattern | (1 << 7) if pixel > pixels[i][j-1] else pattern
+                pattern = pattern | (1 << 0) if pixel > previous_row[j-1] else pattern
+                pattern = pattern | (1 << 1) if pixel > previous_row[j] else pattern
+                pattern = pattern | (1 << 2) if pixel > previous_row[j+1] else pattern
+                pattern = pattern | (1 << 3) if pixel > current_row[j+1] else pattern
+                pattern = pattern | (1 << 4) if pixel > next_row[j+1] else pattern
+                pattern = pattern | (1 << 5) if pixel > next_row[j] else pattern
+                pattern = pattern | (1 << 6) if pixel > next_row[j-1] else pattern
+                pattern = pattern | (1 << 7) if pixel > current_row[j-1] else pattern
                 patterns.append(pattern)
-
+                
         return_patterns[process_id] = patterns;
 
     def _distribute(self):
@@ -128,19 +136,23 @@ class Multiprocessing_Split_LBP(Multiprocessing_LBP):
         patterns = []
         for i in xrange(left_bound, right_bound):
             for j in xrange(1, self.width - 1):
-                pixel = pixels[i][j]
+                # Cache only the rows we need (within the neighborhood)
+                previous_row = pixels[i - 1]
+                current_row = pixels[i]
+                next_row = pixels[i + 1]
 
                 # Compare this pixel to its neighbors, starting at the top-left pixel and moving
                 # clockwise, and use bit operations to efficiently update the feature vector
+                pixel = current_row[j]
                 pattern = 0
-                pattern = pattern | (1 << 0) if pixel > pixels[i-1][j-1] else pattern
-                pattern = pattern | (1 << 1) if pixel > pixels[i-1][j] else pattern
-                pattern = pattern | (1 << 2) if pixel > pixels[i-1][j+1] else pattern
-                pattern = pattern | (1 << 3) if pixel > pixels[i][j+1] else pattern
-                pattern = pattern | (1 << 4) if pixel > pixels[i+1][j+1] else pattern
-                pattern = pattern | (1 << 5) if pixel > pixels[i+1][j] else pattern
-                pattern = pattern | (1 << 6) if pixel > pixels[i+1][j-1] else pattern
-                pattern = pattern | (1 << 7) if pixel > pixels[i][j-1] else pattern
+                pattern = pattern | (1 << 0) if pixel > previous_row[j-1] else pattern
+                pattern = pattern | (1 << 1) if pixel > previous_row[j] else pattern
+                pattern = pattern | (1 << 2) if pixel > previous_row[j+1] else pattern
+                pattern = pattern | (1 << 3) if pixel > current_row[j+1] else pattern
+                pattern = pattern | (1 << 4) if pixel > next_row[j+1] else pattern
+                pattern = pattern | (1 << 5) if pixel > next_row[j] else pattern
+                pattern = pattern | (1 << 6) if pixel > next_row[j-1] else pattern
+                pattern = pattern | (1 << 7) if pixel > current_row[j-1] else pattern
                 patterns.append(pattern)
 
         return_patterns[process_id] = patterns;
