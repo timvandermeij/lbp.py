@@ -116,17 +116,18 @@ class Multiprocessing_Split_LBP(Multiprocessing_LBP):
         Multiprocessing_LBP.__init__(self, filename, num_processes)
 
     def _process(self, process_id, pixels, return_patterns):
-        # Calculate LBP for each non-edge pixel in the segment
         print("[{}] Started processing segment".format(process_id))
-        neighbors = [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1)]
-        patterns = []
 
+        # Determine the bounds for processing
         left_bound = 0
         if process_id == 0:
             left_bound = 1
         right_bound = pixels.shape[0] - 1
         if process_id == (self.num_processes - 1):
             right_bound -= 1
+        
+        # Calculate LBP for each non-edge pixel in the segment
+        patterns = []
         for i in xrange(left_bound, right_bound):
             for j in xrange(1, self.width - 1):
                 pixel = pixels[i][j]
@@ -134,12 +135,14 @@ class Multiprocessing_Split_LBP(Multiprocessing_LBP):
                 # Compare this pixel to its neighbors, starting at the top-left pixel and moving
                 # clockwise, and use bit operations to efficiently update the feature vector
                 pattern = 0
-                index = 0
-                for neighbor in neighbors:
-                    if pixel > pixels[i + neighbor[0]][j + neighbor[1]]:
-                        pattern = pattern | (1 << index)
-                    index += 1
-                
+                pattern = pattern | (1 << 0) if pixel > pixels[i-1][j-1] else pattern
+                pattern = pattern | (1 << 1) if pixel > pixels[i-1][j] else pattern
+                pattern = pattern | (1 << 2) if pixel > pixels[i-1][j+1] else pattern
+                pattern = pattern | (1 << 3) if pixel > pixels[i][j+1] else pattern
+                pattern = pattern | (1 << 4) if pixel > pixels[i+1][j+1] else pattern
+                pattern = pattern | (1 << 5) if pixel > pixels[i+1][j] else pattern
+                pattern = pattern | (1 << 6) if pixel > pixels[i+1][j-1] else pattern
+                pattern = pattern | (1 << 7) if pixel > pixels[i][j-1] else pattern
                 patterns.append(pattern)
 
         return_patterns[process_id] = patterns;
