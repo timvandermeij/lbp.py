@@ -1,4 +1,4 @@
-# TODO: use OpenBLAS?
+# TODO: use OpenBLAS or Pathos?
 
 import sys
 import os.path
