@@ -93,7 +93,7 @@ class Multiprocessing_LBP(LBP):
                 pattern = pattern | (1 << 7) if pixel > current_row[j-1] else pattern
                 patterns.append(pattern)
                 
-        return_patterns[process_id] = patterns;
+        return_patterns[process_id] = patterns
 
     def _distribute(self):
         # Collect return values from the processes
@@ -156,7 +156,7 @@ class Multiprocessing_Split_LBP(Multiprocessing_LBP):
                 pattern = pattern | (1 << 7) if pixel > current_row[j-1] else pattern
                 patterns.append(pattern)
 
-        return_patterns[process_id] = patterns;
+        return_patterns[process_id] = patterns
 
     def _distribute(self):
         # Collect return values from the processes
