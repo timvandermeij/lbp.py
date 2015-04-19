@@ -66,7 +66,6 @@ class Multiprocessing_LBP(LBP):
 
         # Calculate LBP for each non-edge pixel in the segment
         print("[{}] Started processing pixels {} to {}".format(process_id, left_bound, right_bound))
-        neighbors = [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1)]
         patterns = []
         for i in xrange(left_bound, right_bound):
             for j in xrange(1, self.width - 1):
@@ -75,12 +74,14 @@ class Multiprocessing_LBP(LBP):
                 # Compare this pixel to its neighbors, starting at the top-left pixel and moving
                 # clockwise, and use bit operations to efficiently update the feature vector
                 pattern = 0
-                index = 0
-                for neighbor in neighbors:
-                    if pixel > pixels[i + neighbor[0]][j + neighbor[1]]:
-                        pattern = pattern | (1 << index)
-                    index += 1
-                
+                pattern = pattern | (1 << 0) if pixel > pixels[i-1][j-1] else pattern
+                pattern = pattern | (1 << 1) if pixel > pixels[i-1][j] else pattern
+                pattern = pattern | (1 << 2) if pixel > pixels[i-1][j+1] else pattern
+                pattern = pattern | (1 << 3) if pixel > pixels[i][j+1] else pattern
+                pattern = pattern | (1 << 4) if pixel > pixels[i+1][j+1] else pattern
+                pattern = pattern | (1 << 5) if pixel > pixels[i+1][j] else pattern
+                pattern = pattern | (1 << 6) if pixel > pixels[i+1][j-1] else pattern
+                pattern = pattern | (1 << 7) if pixel > pixels[i][j-1] else pattern
                 patterns.append(pattern)
 
         return_patterns[process_id] = patterns;
