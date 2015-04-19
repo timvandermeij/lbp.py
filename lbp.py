@@ -1,11 +1,10 @@
 # TODO: use OpenBLAS?
-# TODO: avoid Managers as they are slow
 
 import sys
 import os.path
 import numpy as np
 from PIL import Image
-from multiprocessing import Process, Manager
+from multiprocessing import Process, Queue
 import sharedmem
 
 class LBP:
@@ -61,7 +60,7 @@ class Multiprocessing_LBP(LBP):
         self._distribute()
         self._output()
 
-    def _process(self, process_id, pixels, return_patterns):
+    def _process(self, process_id, pixels, queue):
         # Set the left and right bounds of the segment to process
         segment_height = int(np.floor(self.height / self.num_processes))
         left_bound = (process_id * segment_height) if process_id != 0 else 1
@@ -93,30 +92,29 @@ class Multiprocessing_LBP(LBP):
                 pattern = pattern | (1 << 7) if pixel > current_row[j-1] else pattern
                 patterns.append(pattern)
                 
-        return_patterns[process_id] = patterns
+        queue.put([process_id, patterns])
 
     def _distribute(self):
-        # Collect return values from the processes
-        manager = Manager()
-        patterns = manager.dict()
-        for process_id in xrange(self.num_processes):
-            patterns[process_id] = []
-
         # Put the pixel array in shared memory for all processes
         pixels = sharedmem.copy(np.array(self.image))
 
         # Spawn the processes
         processes = []
+        queue = Queue()
         for process_id in xrange(self.num_processes):
-            process = Process(target=self._process, args=(process_id, pixels, patterns))
+            process = Process(target=self._process, args=(process_id, pixels, queue))
             processes.append(process)
             process.start()
 
         # Wait for all processes to finish
+        results = [queue.get() for process in processes]
         [process.join() for process in processes]
 
         # Format the pixels correctly for the output function,
         # which expects a linear list of pixel values.
+        patterns = {}
+        for pattern in results:
+            patterns[pattern[0]] = pattern[1]
         for process_id in xrange(self.num_processes):
             self.patterns.extend(patterns[process_id])
 
@@ -124,7 +122,7 @@ class Multiprocessing_Split_LBP(Multiprocessing_LBP):
     def __init__(self, filename, num_processes):
         Multiprocessing_LBP.__init__(self, filename, num_processes)
 
-    def _process(self, process_id, pixels, return_patterns):
+    def _process(self, process_id, pixels, queue):
         # Determine the bounds for processing
         left_bound = 0
         if process_id == 0:
@@ -156,18 +154,12 @@ class Multiprocessing_Split_LBP(Multiprocessing_LBP):
                 pattern = pattern | (1 << 7) if pixel > current_row[j-1] else pattern
                 patterns.append(pattern)
 
-        return_patterns[process_id] = patterns
+        queue.put([process_id, patterns])
 
     def _distribute(self):
-        # Collect return values from the processes
-        manager = Manager()
-        patterns = manager.dict()
-        for process_id in xrange(self.num_processes):
-            patterns[process_id] = []
-
-        # Spawn the processes
         pixels = np.array(self.image)
         processes = []
+        queue = Queue()
         for process_id in xrange(self.num_processes):
             # Pass only the part of the image that the process needs to work with.
             # This is done in order to make the processes work independently.
@@ -184,15 +176,19 @@ class Multiprocessing_Split_LBP(Multiprocessing_LBP):
 
             # Start the process and pass only the pixels within the bounds
             segment_pixels = pixels[left_bound:right_bound]
-            process = Process(target=self._process, args=(process_id, segment_pixels, patterns))
+            process = Process(target=self._process, args=(process_id, segment_pixels, queue))
             processes.append(process)
             process.start()
         
         # Wait for all processes to finish
+        results = [queue.get() for process in processes]
         [process.join() for process in processes]
 
         # Format the pixels correctly for the output function,
         # which expects a linear list of pixel values.
+        patterns = {}
+        for pattern in results:
+            patterns[pattern[0]] = pattern[1]
         for process_id in xrange(self.num_processes):
             self.patterns.extend(patterns[process_id])
 
