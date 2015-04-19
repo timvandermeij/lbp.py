@@ -24,7 +24,6 @@ class LBP:
         pixels = [pixels[i * self.width:(i + 1) * self.width] for i in xrange(self.height)]
 
         # Calculate LBP for each non-edge pixel
-        neighbors = [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1)]
         for i in xrange(1, self.height - 1):
             for j in xrange(1, self.width - 1):
                 pixel = pixels[i][j]
@@ -32,12 +31,14 @@ class LBP:
                 # Compare this pixel to its neighbors, starting at the top-left pixel and moving
                 # clockwise, and use bit operations to efficiently update the feature vector
                 pattern = 0
-                index = 0
-                for neighbor in neighbors:
-                    if pixel > pixels[i + neighbor[0]][j + neighbor[1]]:
-                        pattern = pattern | (1 << index)
-                    index += 1
-
+                pattern = pattern | (1 << 0) if pixel > pixels[i-1][j-1] else pattern
+                pattern = pattern | (1 << 1) if pixel > pixels[i-1][j] else pattern
+                pattern = pattern | (1 << 2) if pixel > pixels[i-1][j+1] else pattern
+                pattern = pattern | (1 << 3) if pixel > pixels[i][j+1] else pattern
+                pattern = pattern | (1 << 4) if pixel > pixels[i+1][j+1] else pattern
+                pattern = pattern | (1 << 5) if pixel > pixels[i+1][j] else pattern
+                pattern = pattern | (1 << 6) if pixel > pixels[i+1][j-1] else pattern
+                pattern = pattern | (1 << 7) if pixel > pixels[i][j-1] else pattern
                 self.patterns.append(pattern)
 
     def _output(self):
