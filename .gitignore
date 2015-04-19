@@ -1,3 +1,4 @@
 *.pyc
 output.png
 images
+*.swp
