@@ -93,7 +93,10 @@ class Multiprocessing_LBP(LBP):
                 pattern = pattern | (1 << 7) if pixel > current_row[j-1] else pattern
                 patterns.append(pattern)
                 
-        queue.put([process_id, patterns])
+        queue.put({
+            'process_id': process_id,
+            'patterns': patterns
+        })
 
     def _distribute(self):
         # Put the pixel array in shared memory for all processes
@@ -113,11 +116,9 @@ class Multiprocessing_LBP(LBP):
 
         # Format the pixels correctly for the output function,
         # which expects a linear list of pixel values.
-        patterns = {}
-        for pattern in results:
-            patterns[pattern[0]] = pattern[1]
+        results = sorted(results, key=lambda k: k['process_id']) 
         for process_id in xrange(self.num_processes):
-            self.patterns.extend(patterns[process_id])
+            self.patterns.extend(results[process_id]['patterns'])
 
 class Multiprocessing_Split_LBP(Multiprocessing_LBP):
     def __init__(self, filename, num_processes):
@@ -155,7 +156,10 @@ class Multiprocessing_Split_LBP(Multiprocessing_LBP):
                 pattern = pattern | (1 << 7) if pixel > current_row[j-1] else pattern
                 patterns.append(pattern)
 
-        queue.put([process_id, patterns])
+        queue.put({
+            'process_id': process_id,
+            'patterns': patterns
+        })
 
     def _distribute(self):
         pixels = np.array(self.image)
@@ -187,11 +191,9 @@ class Multiprocessing_Split_LBP(Multiprocessing_LBP):
 
         # Format the pixels correctly for the output function,
         # which expects a linear list of pixel values.
-        patterns = {}
-        for pattern in results:
-            patterns[pattern[0]] = pattern[1]
+        results = sorted(results, key=lambda k: k['process_id']) 
         for process_id in xrange(self.num_processes):
-            self.patterns.extend(patterns[process_id])
+            self.patterns.extend(results[process_id]['patterns'])
 
 def main(argv):
     filename = argv[0] if len(argv) > 0 else "input.png"
