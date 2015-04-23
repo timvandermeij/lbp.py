@@ -106,8 +106,8 @@ class Multiprocessing_LBP(LBP):
         queue = Queue()
         for process_id in xrange(self.num_processes):
             process = Process(target=self._process, args=(process_id, pixels, queue))
-            processes.append(process)
             process.start()
+            processes.append(process)
 
         # Wait for all processes to finish
         results = [queue.get() for process in processes]
@@ -171,9 +171,9 @@ class Multiprocessing_Split_LBP(Multiprocessing_LBP):
             # Because of the neighborhood, each segment should partially overlap
             # with the next and/or previous segment.
             left_bound = process_id * segment_height
+            right_bound = left_bound + segment_height
             if process_id > 0:
                 left_bound -= 1
-            right_bound = (process_id * segment_height) + segment_height
             if process_id == (self.num_processes - 1):
                 # The last process should also process any remaining rows
                 right_bound = self.height
@@ -181,8 +181,8 @@ class Multiprocessing_Split_LBP(Multiprocessing_LBP):
             # Start the process and pass only the pixels within the bounds
             segment_pixels = pixels[left_bound:right_bound]
             process = Process(target=self._process, args=(process_id, segment_pixels, queue))
-            processes.append(process)
             process.start()
+            processes.append(process)
         
         # Wait for all processes to finish
         results = [queue.get() for process in processes]
