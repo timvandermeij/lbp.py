@@ -5,7 +5,6 @@ import os.path
 import numpy as np
 from PIL import Image
 from multiprocessing import Process, Queue
-import sharedmem
 
 class LBP:
     def __init__(self, filename, *ignore):
@@ -98,8 +97,7 @@ class Multiprocessing_LBP(LBP):
         })
 
     def _distribute(self):
-        # Put the pixel array in shared memory for all processes
-        pixels = sharedmem.copy(np.array(self.image))
+        pixels = np.array(self.image)
 
         # Spawn the processes
         processes = []

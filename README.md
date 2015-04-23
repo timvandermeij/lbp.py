@@ -5,4 +5,3 @@ Requirements
   * NumPy
   * Pillow
   * BeautifulSoup
-  * sharedmem
