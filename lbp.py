@@ -1,5 +1,3 @@
-# TODO: use OpenBLAS/MPI?
-
 import sys
 import os.path
 import numpy as np
