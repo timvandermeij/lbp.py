@@ -116,8 +116,8 @@ class Multiprocessing_LBP(LBP):
         # Format the pixels correctly for the output function,
         # which expects a linear list of pixel values.
         results = sorted(results, key=lambda k: k['process_id']) 
-        for process_id in xrange(self.num_processes):
-            self.patterns.extend(results[process_id]['patterns'])
+        for result in results:
+            self.patterns.extend(result['patterns'])
 
 class Multiprocessing_Split_LBP(Multiprocessing_LBP):
     def __init__(self, filename, num_processes):
@@ -191,8 +191,8 @@ class Multiprocessing_Split_LBP(Multiprocessing_LBP):
         # Format the pixels correctly for the output function,
         # which expects a linear list of pixel values.
         results = sorted(results, key=lambda k: k['process_id']) 
-        for process_id in xrange(self.num_processes):
-            self.patterns.extend(results[process_id]['patterns'])
+        for result in results:
+            self.patterns.extend(result['patterns'])
 
 def main(argv):
     filename = argv[0] if len(argv) > 0 else "input.png"
