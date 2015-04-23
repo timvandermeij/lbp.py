@@ -26,12 +26,12 @@ class LBP:
 
         # Calculate LBP for each non-edge pixel
         for i in xrange(1, self.height - 1):
-            for j in xrange(1, self.width - 1):
-                # Cache only the rows we need (within the neighborhood)
-                previous_row = pixels[i - 1]
-                current_row = pixels[i]
-                next_row = pixels[i + 1]
+            # Cache only the rows we need (within the neighborhood)
+            previous_row = pixels[i - 1]
+            current_row = pixels[i]
+            next_row = pixels[i + 1]
 
+            for j in xrange(1, self.width - 1):
                 # Compare this pixel to its neighbors, starting at the top-left pixel and moving
                 # clockwise, and use bit operations to efficiently update the feature vector
                 pixel = current_row[j]
@@ -73,12 +73,12 @@ class Multiprocessing_LBP(LBP):
         # Calculate LBP for each non-edge pixel in the segment
         patterns = []
         for i in xrange(left_bound, right_bound):
-            for j in xrange(1, self.width - 1):
-                # Cache only the rows we need (within the neighborhood)
-                previous_row = pixels[i - 1]
-                current_row = pixels[i]
-                next_row = pixels[i + 1]
+            # Cache only the rows we need (within the neighborhood)
+            previous_row = pixels[i - 1]
+            current_row = pixels[i]
+            next_row = pixels[i + 1]
 
+            for j in xrange(1, self.width - 1):
                 # Compare this pixel to its neighbors, starting at the top-left pixel and moving
                 # clockwise, and use bit operations to efficiently update the feature vector
                 pixel = current_row[j]
@@ -135,12 +135,12 @@ class Multiprocessing_Split_LBP(Multiprocessing_LBP):
         # Calculate LBP for each non-edge pixel in the segment
         patterns = []
         for i in xrange(left_bound, right_bound):
-            for j in xrange(1, self.width - 1):
-                # Cache only the rows we need (within the neighborhood)
-                previous_row = pixels[i - 1]
-                current_row = pixels[i]
-                next_row = pixels[i + 1]
+            # Cache only the rows we need (within the neighborhood)
+            previous_row = pixels[i - 1]
+            current_row = pixels[i]
+            next_row = pixels[i + 1]
 
+            for j in xrange(1, self.width - 1):
                 # Compare this pixel to its neighbors, starting at the top-left pixel and moving
                 # clockwise, and use bit operations to efficiently update the feature vector
                 pixel = current_row[j]
