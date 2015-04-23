@@ -14,7 +14,7 @@ The versions indicated below have been verified. Other versions are also likely 
 Cloning the repository
 ======================
 
-The first step is to clone the repository to obtain a local copy of the code. Open a terminal window and run the following commands.
+The first step is to clone the repository to obtain a local copy of the code. Open a terminal and run the following commands.
 
     $ git clone https://github.com/timvandermeij/lbp.py.git
     $ cd lbp.py
@@ -22,8 +22,8 @@ The first step is to clone the repository to obtain a local copy of the code. Op
 Running the code
 ================
 
-The first step is to obtain images to run `lbp.py` on. We use a scraper to get large, high resolution, images from [Unsplash](https://www.unsplash.com), which
-provides free images under a [Creative Commons Zero](https://www.unsplash.com/license) license. Execute the following command in a terminal:
+The first step is to obtain images to run `lbp.py` on. We use a scraper to get large, high resolution images from [Unsplash](https://unsplash.com), which
+provides free images under a [Creative Commons Zero](https://unsplash.com/license) license. Execute the following command in a terminal:
 
     $ python scraper.py 10
 
@@ -51,8 +51,8 @@ LBP variant on `images/1.jpg` with 8 processes as follows:
     $ python lbp.py images/1.jpg multi-lbp 8
 
 The multiprocessing split LBP variant works the same as the multiprocessing LBP variant with the exception that it does not pass the entire image as input
-for the processes, but rather the exact slice that each process must work on. The idea is to reduce overhead when passing the entire large image to each
-process. One can run the multiprocessing split LBP variant on `images/1.jpg` with 8 processes as follows:
+for the processes, but rather the exact slice that each process must work on. The idea is to reduce image passing overhead. One can run the multiprocessing
+split LBP variant on `images/1.jpg` with 8 processes as follows:
 
     $ python lbp.py images/1.jpg multi-split-lbp 8
 
