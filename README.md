@@ -59,6 +59,11 @@ process. One can run the multiprocessing split LBP variant on `images/1.jpg` wit
 Finally we have included the `benchmark.sh` script to get time and memory consumption information when running a command. Prepend `./benchmark.sh` before the
 command to obtain time and memory consumption after the command has terminated.
 
+License
+=======
+
+`lbp.py` is licensed under the permissive MIT license.
+
 Author
 ======
 
