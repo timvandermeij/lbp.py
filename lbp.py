@@ -1,5 +1,4 @@
-# TODO: use OpenBLAS?
-# TODO: multiprocessing pickle is slow. Find another way (dill/marhsla) or try MPI.
+# TODO: use OpenBLAS/MPI?
 
 import sys
 import os.path
