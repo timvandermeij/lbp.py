@@ -59,6 +59,57 @@ split LBP variant on `images/1.jpg` with 8 processes as follows:
 Finally we have included the `benchmark.sh` script to get time and memory consumption information when running a command. Prepend `./benchmark.sh` before the
 command to obtain time and memory consumption after the command has terminated.
 
+Installation notes for `huisuil01`
+==================================
+
+To use `lbp.py` on the `huisuil01` server at Leiden University, one must use a virtual environment as the installed Python version 2.7.3 is lower than required
+for `lbp.py`. Follow the steps outlined below to set up a virtual environment with Python 2.7.9 and all required packages.
+
+Python
+------
+
+Compile Python (version 2.7.9) from source:
+
+    $ cd /scratch
+    $ mkdir {username}
+    $ chmod 700 {username}
+    $ cd {username}
+    $ wget https://www.python.org/ftp/python/2.7.9/Python-2.7.9.tgz
+    $ tar xzvf Python-2.7.9.tgz
+    $ cd Python-2.7.9
+    $ ./configure --prefix=/scratch/{username}/python
+    $ make
+    $ make install
+    $ rm Python-2.7.9.tgz
+
+Virtualenv
+----------
+
+`virtualenv` is already installed on `huisuil01`. Create a new virtual environment with the compiled Python interpreter as default:
+
+    $ cd ..
+    $ virtualenv -p /scratch/{username}/python lbp
+
+Packages
+--------
+
+Activate the virtual environment:
+
+    $ source lbp/bin/activate
+
+Update `pip` to the most recent version:
+
+    (lbp)$ wget https://bootstrap.pypa.io/get-pip.py
+    (lbp)$ python get-pip.py -U -I
+
+Then install the following dependencies:
+
+    (lbp)$ pip install numpy
+    (lbp)$ pip install pillow
+    (lbp)$ pip install beautifulsoup
+
+Now we can run `lbp.py` using the steps described above when we have activated the virtual environment.
+
 License
 =======
 
