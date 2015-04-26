@@ -41,20 +41,20 @@ Now that we have a dataset, we can run the local binary patterns algorithm. Ther
 as possible. We refer the reader to the commit history for the exact optimizations that have been applied to the initial naive implementations. The regular
 LBP algorithm is essentially a baseline for research. One can run the regular LBP variant on `images/1.jpg` as follows:
 
-    $ python lbp.py images/1.jpg lbp
+    $ python main.py images/1.jpg lbp
 
 The multiprocessing LBP variant works by dividing the input image into _p_ horizontal slices and spawning _p_ processes. Each process gets as input the
 entire image and the bounds of the slice that it should work on. The process applies the regular LBP algorithm on only the assigned slice and returns the
 LBP descriptors. The main process collects the LBP descriptors from each process and merges them to create the final output. One can run the multiprocessing
 LBP variant on `images/1.jpg` with 8 processes as follows:
 
-    $ python lbp.py images/1.jpg multi-lbp 8
+    $ python main.py images/1.jpg multi-lbp 8
 
 The multiprocessing split LBP variant works the same as the multiprocessing LBP variant with the exception that it does not pass the entire image as input
 for the processes, but rather the exact slice that each process must work on. The idea is to reduce image passing overhead. One can run the multiprocessing
 split LBP variant on `images/1.jpg` with 8 processes as follows:
 
-    $ python lbp.py images/1.jpg multi-split-lbp 8
+    $ python main.py images/1.jpg multi-split-lbp 8
 
 Finally we have included the `benchmark.sh` script to get time and memory consumption information when running a command. Prepend `./benchmark.sh` before the
 command to obtain time and memory consumption after the command has terminated.
