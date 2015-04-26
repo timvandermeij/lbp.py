@@ -2,6 +2,7 @@ import sys
 import os
 from BeautifulSoup import BeautifulSoup
 import urllib2
+import imghdr
 
 class Scraper:
     MAIN_URL = 'https://unsplash.com'
@@ -33,7 +34,8 @@ class Scraper:
         downloaded_size = 0
         block_size = 8192
         connection = urllib2.urlopen(Scraper.MAIN_URL + source)
-        output = open('{}/{}.jpg'.format(self.target, self.downloaded + 1), 'wb')
+        output_file = '{}/{}'.format(self.target, self.downloaded + 1)
+        output = open('{}.tmp'.format(output_file), 'wb')
         total_size = int(connection.info().getheaders("Content-Length")[0])
         
         while True:
@@ -44,13 +46,17 @@ class Scraper:
             downloaded_size += len(buffer)
             output.write(buffer)
             percentage = int(float(downloaded_size * 100) / total_size)
-            message = r"Downloading {} [{:3d}%]".format(source, percentage)
+            message = r"Downloading image {} [{:3d}%]".format(self.downloaded + 1, percentage)
             message = message + chr(8) * len(message) # Clear the previous message
             sys.stdout.write(message)
 
         sys.stdout.write('\n')
         output.close()
         self.downloaded += 1
+
+        # Rename the temporary file extension to the actual file extension
+        file_type = imghdr.what('{}.tmp'.format(output_file))
+        os.rename('{}.tmp'.format(output_file), '{}.{}'.format(output_file, file_type))
 
 def main(argv):
     limit = int(argv[0]) if len(argv) > 0 else 10
