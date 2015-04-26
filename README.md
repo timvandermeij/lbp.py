@@ -5,11 +5,11 @@ Prerequisites
 
 The versions indicated below have been verified. Other versions are also likely to work, but that has not been verified.
 
-* Git 2.3.5
+* Git 2.3.6
 * Python 2.7.9 with the following packages:
-  * NumPy
-  * Pillow
-  * BeautifulSoup
+  * NumPy 1.9.2
+  * Pillow 2.7.0
+  * BeautifulSoup 3.2.1
 
 Cloning the repository
 ======================
