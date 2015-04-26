@@ -101,6 +101,7 @@ Update `pip` to the most recent version:
 
     (lbp)$ wget https://bootstrap.pypa.io/get-pip.py
     (lbp)$ python get-pip.py -U -I
+    (lbp)$ rm get-pip.py
 
 Then install the following dependencies:
 
