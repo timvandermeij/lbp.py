@@ -80,6 +80,7 @@ Compile Python (version 2.7.9) from source:
     $ ./configure --prefix=/scratch/{username}/python
     $ make
     $ make install
+    $ cd ..
     $ rm Python-2.7.9.tgz
 
 Virtualenv
@@ -87,7 +88,6 @@ Virtualenv
 
 `virtualenv` is already installed on `huisuil01`. Create a new virtual environment with the compiled Python interpreter as default:
 
-    $ cd ..
     $ virtualenv -p /scratch/{username}/python lbp
 
 Packages
