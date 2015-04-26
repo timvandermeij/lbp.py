@@ -82,13 +82,14 @@ Compile Python (version 2.7.9) from source:
     $ make install
     $ cd ..
     $ rm Python-2.7.9.tgz
+    $ rm -r Python-2.7.9
 
 Virtualenv
 ----------
 
 `virtualenv` is already installed on `huisuil01`. Create a new virtual environment with the compiled Python interpreter as default:
 
-    $ virtualenv -p /scratch/{username}/python lbp
+    $ virtualenv -p /scratch/{username}/python/bin/python lbp
 
 Packages
 --------
