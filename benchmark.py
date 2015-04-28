@@ -1,5 +1,4 @@
 # TODO:
-# - Investigate how to interpret time
 # - SVG plot
 # - Possibility to run other images
 
@@ -26,26 +25,19 @@ class Results:
     def _parse(self, output, cores):
         result = {
             'cores': cores,
-            'time': 0,
+            'real_time': 0,
+            'user_sys_time': 0,
             'memory': 0
         }
-        while True:
-            line = output.readline()
-            if line == "":
-                break
-            if line.find('User time (seconds)') != -1:
-                result['time'] += float(line.split(':')[1])
-            if line.find('System time (seconds)') != -1:
-                result['time'] += float(line.split(':')[1])
-            if line.find('Maximum resident set size (kbytes)') != -1:
-                # Measured in kB, but we want MB
-                result['memory'] += (int(line.split(':')[1]) / 4) / 1000
-
-        result['time'] = round(result['time'], 2)
+        line = output.readline()
+        measurements = line.split('-')
+        result['real_time'] = float(measurements[0])
+        result['user_sys_time'] = float(measurements[1]) + float(measurements[2])
+        result['memory'] += (int(measurements[3]) / 4) / 1000 # Convert kB to MB
         return result
 
 def run(algorithm, cores, results):
-    process = subprocess.Popen(['/usr/bin/time', '-v', sys.executable, 'main.py', 'images/1.jpeg', algorithm, str(cores)], stderr=subprocess.PIPE)
+    process = subprocess.Popen(['/usr/bin/time', '-f', '%e-%S-%U-%M', sys.executable, 'main.py', 'images/1.jpeg', algorithm, str(cores)], stderr=subprocess.PIPE)
     results.append(algorithm, cores, process.stderr)
 
 def main(argv):
