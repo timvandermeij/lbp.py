@@ -110,6 +110,7 @@ Then install the following dependencies:
     (lbp)$ pip install numpy
     (lbp)$ pip install pillow
     (lbp)$ pip install beautifulsoup
+    (lbp)$ pip install matplotlib
 
 Now we can run `lbp.py` using the steps described above when we have activated the virtual environment.
 

@@ -42,20 +42,24 @@ class Plot:
         self.results = results
         self.bar_width = 0.5
 
+    def _preprocess(self, runs):
+        # Preprocess the data for usage with Matplotlib
+        real_time = ()
+        memory = ()
+        for item in runs:
+            real_time += (item['real_time'],)
+            memory += (item['memory'],)
+
+        return (real_time, memory)
+
     def create(self):
         for algorithm, runs in self.results.iteritems():
             # Determine the number of groups and create the initial plot
             x_groups = np.arange(len(runs))
             fig, ax = plt.subplots()
 
-            # Format the data for Matplotlib
-            real_time = ()
-            memory = ()
-            for item in runs:
-                real_time += (item['real_time'],)
-                memory += (item['memory'],)
-
             # Create two bars per run
+            real_time, memory = self._preprocess(runs)
             ax.bar(x_groups - 0.2, real_time, self.bar_width - 0.1, color='b', alpha=0.5, align='center', label='Real time (seconds)')
             ax.bar(x_groups + 0.2, memory, self.bar_width - 0.1, color='r', alpha=0.5, align='center', label='Peak memory consumption (MB)')
 
