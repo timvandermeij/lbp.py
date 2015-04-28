@@ -10,6 +10,7 @@ The versions indicated below have been verified. Other versions are also likely 
   * NumPy 1.9.2
   * Pillow 2.7.0
   * BeautifulSoup 3.2.1
+  * Matplotlib 1.4.3
 
 Cloning the repository
 ======================

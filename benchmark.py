@@ -1,11 +1,12 @@
 # TODO:
-# - SVG plot
 # - Possibility to run other images
 
 import sys
 import multiprocessing
 import subprocess
 import json
+import numpy as np
+import matplotlib.pyplot as plt
 
 class Results:
     def __init__(self):
@@ -36,6 +37,42 @@ class Results:
         result['memory'] += (int(measurements[3]) / 4) / 1000 # Convert kB to MB
         return result
 
+class Plot:
+    def __init__(self, results):
+        self.results = results
+        self.bar_width = 0.5
+
+    def create(self):
+        for algorithm, runs in self.results.iteritems():
+            # Determine the number of groups and create the initial plot
+            x_groups = np.arange(len(runs))
+            fig, ax = plt.subplots()
+
+            # Format the data for Matplotlib
+            real_time = ()
+            memory = ()
+            for item in runs:
+                real_time += (item['real_time'],)
+                memory += (item['memory'],)
+
+            # Create two bars per run
+            ax.bar(x_groups - 0.2, real_time, self.bar_width - 0.1, color='b', alpha=0.5, align='center', label='Real time (seconds)')
+            ax.bar(x_groups + 0.2, memory, self.bar_width - 0.1, color='r', alpha=0.5, align='center', label='Peak memory consumption (MB)')
+
+            # Set the plot labels and ticks
+            ax.set_xlabel('Processes')
+            ax.set_ylabel('Consumption')
+            ax.set_title(algorithm)
+            ax.set_xticks(x_groups + (self.bar_width / 2.0) - 0.25)
+            ax.set_xticklabels(range(1, multiprocessing.cpu_count() + 1))
+
+            # Add a legend
+            ax.legend(loc=1, prop={'size':6})
+
+            # Add a grid and save the plot as an EPS file
+            plt.grid(True)
+            plt.savefig("benchmark_plot_{}.eps".format(algorithm))
+
 def run(algorithm, cores, results):
     process = subprocess.Popen(['/usr/bin/time', '-f', '%e-%S-%U-%M', sys.executable, 'main.py', 'images/1.jpeg', algorithm, str(cores)], stderr=subprocess.PIPE)
     results.append(algorithm, cores, process.stderr)
@@ -58,9 +95,13 @@ def main(argv):
         print("Benchmarking multiprocessing split LBP with {} cores...".format(cores))
         run("multi-split-lbp", cores, results)
 
-    print("Writing results to benchmark_data.json...")
-    with open('benchmark_data.json', 'w') as output:
+    print("Writing results JSON...")
+    with open('benchmark_results.json', 'w') as output:
         json.dump(results.get(), output, indent=4, separators=(',', ': '))
+
+    print("Writing plot SVGs...")
+    plot = Plot(results.get())
+    plot.create()
 
 if __name__ == "__main__":
     main(sys.argv[1:])
