@@ -44,6 +44,10 @@ class Results:
 
         return result
 
+def run(algorithm, cores, results):
+    process = subprocess.Popen(['/usr/bin/time', '-v', 'python2', 'main.py', 'images/1.jpeg', algorithm, str(cores)], stderr=subprocess.PIPE)
+    results.append(algorithm, cores, process.stderr)
+
 def main(argv):
     results = Results()
     
@@ -52,18 +56,15 @@ def main(argv):
         # LBP
         if cores == 1:
             print("Benchmarking LBP...")
-            process = subprocess.Popen(['/usr/bin/time', '-v', 'python2', 'main.py', 'images/1.jpeg', 'lbp'], stderr=subprocess.PIPE)
-            results.append('lbp', cores, process.stderr)
+            run("lbp", cores, results)
 
         # Multiprocessing LBP
         print("Benchmarking multiprocessing LBP with {} cores...".format(cores))
-        process = subprocess.Popen(['/usr/bin/time', '-v', 'python2', 'main.py', 'images/1.jpeg', 'multi-lbp', str(cores)], stderr=subprocess.PIPE)
-        results.append('multi-lbp', cores, process.stderr)
+        run("multi-lbp", cores, results)
 
         # Multiprocessing LBP
         print("Benchmarking multiprocessing split LBP with {} cores...".format(cores))
-        process = subprocess.Popen(['/usr/bin/time', '-v', 'python2', 'main.py', 'images/1.jpeg', 'multi-split-lbp', str(cores)], stderr=subprocess.PIPE)
-        results.append('multi-split-lbp', cores, process.stderr)
+        run("multi-split-lbp", cores, results)
 
     print("Writing results to benchmark_data.json...")
     with open('benchmark_data.json', 'w') as output:
