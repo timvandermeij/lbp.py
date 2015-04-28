@@ -1,6 +1,3 @@
-# TODO:
-# - Possibility to run other images
-
 import sys
 import multiprocessing
 import subprocess
