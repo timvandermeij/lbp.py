@@ -1,5 +1,4 @@
 # TODO:
-# - Round long numbers to two decimals
 # - Investigate how to interpret time
 # - SVG plot
 # - Possibility to run other images
@@ -42,6 +41,7 @@ class Results:
                 # Measured in kB, but we want MB
                 result['memory'] += (int(line.split(':')[1]) / 4) / 1000
 
+        result['time'] = round(result['time'], 2)
         return result
 
 def run(algorithm, cores, results):
