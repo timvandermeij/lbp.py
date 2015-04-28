@@ -45,7 +45,7 @@ class Results:
         return result
 
 def run(algorithm, cores, results):
-    process = subprocess.Popen(['/usr/bin/time', '-v', 'python2', 'main.py', 'images/1.jpeg', algorithm, str(cores)], stderr=subprocess.PIPE)
+    process = subprocess.Popen(['/usr/bin/time', '-v', sys.executable, 'main.py', 'images/1.jpeg', algorithm, str(cores)], stderr=subprocess.PIPE)
     results.append(algorithm, cores, process.stderr)
 
 def main(argv):
