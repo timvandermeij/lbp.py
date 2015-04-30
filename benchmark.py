@@ -49,30 +49,30 @@ class Plot:
 
         return (real_time, memory)
 
-    def create(self):
+    def _create(self, data, algorithm, runs, label, file_name):
+        # Create the initial plot
+        x_groups = np.arange(len(runs))
+        fig, ax = plt.subplots()
+
+        # Add the bars
+        ax.bar(x_groups, data, self.bar_width, color='b', alpha=0.5, align='center')
+
+        # Set the labels and ticks
+        ax.set_xlabel('Number of processes')
+        ax.set_ylabel(label)
+        ax.set_title(algorithm)
+        ax.set_xticks(x_groups)
+        ax.set_xticklabels(range(1, multiprocessing.cpu_count() + 1))
+        
+        # Add a grid and save the plot
+        plt.grid(True)
+        plt.savefig(file_name)
+
+    def output(self):
         for algorithm, runs in self.results.iteritems():
-            # Determine the number of groups and create the initial plot
-            x_groups = np.arange(len(runs))
-            fig, ax = plt.subplots()
-
-            # Create two bars per run
             real_time, memory = self._preprocess(runs)
-            ax.bar(x_groups - 0.2, real_time, self.bar_width - 0.1, color='b', alpha=0.5, align='center', label='Real time (seconds)')
-            ax.bar(x_groups + 0.2, memory, self.bar_width - 0.1, color='r', alpha=0.5, align='center', label='Peak memory consumption (MB)')
-
-            # Set the plot labels and ticks
-            ax.set_xlabel('Processes')
-            ax.set_ylabel('Consumption')
-            ax.set_title(algorithm)
-            ax.set_xticks(x_groups + (self.bar_width / 2.0) - 0.25)
-            ax.set_xticklabels(range(1, multiprocessing.cpu_count() + 1))
-
-            # Add a legend
-            ax.legend(loc=1, prop={'size':6})
-
-            # Add a grid and save the plot as an EPS file
-            plt.grid(True)
-            plt.savefig("benchmark_plot_{}.eps".format(algorithm))
+            self._create(real_time, algorithm, runs, 'Real time (seconds)', 'benchmark_plot_{}_real_time.eps'.format(algorithm))
+            self._create(memory, algorithm, runs, 'Peak memory usage (MB)', 'benchmark_plot_{}_memory.eps'.format(algorithm))
 
 def run(algorithm, cores, results):
     process = subprocess.Popen(
@@ -109,7 +109,7 @@ def main():
 
     print("Writing plot SVGs...")
     plot = Plot(results.get())
-    plot.create()
+    plot.output()
 
 if __name__ == "__main__":
     main()
