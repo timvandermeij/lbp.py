@@ -75,7 +75,14 @@ class Plot:
             plt.savefig("benchmark_plot_{}.eps".format(algorithm))
 
 def run(algorithm, cores, results):
-    process = subprocess.Popen(['/usr/bin/time', '-f', '%e-%S-%U-%M', sys.executable, 'main.py', 'images/1.jpeg', algorithm, str(cores)], stderr=subprocess.PIPE)
+    process = subprocess.Popen(
+        [
+            '/usr/bin/time',
+            '-f', '%e-%S-%U-%M',
+            sys.executable, 'main.py', '--input', 'images/1.jpeg', '--algorithm', algorithm, '--processes', str(cores)
+        ],
+        stderr=subprocess.PIPE
+    )
     results.append(algorithm, cores, process.stderr)
 
 def main():
