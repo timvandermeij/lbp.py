@@ -23,14 +23,14 @@ The first step is to clone the repository to obtain a local copy of the code. Op
 Running the code
 ================
 
-The first step is to obtain images to run `lbp.py` on. We use a scraper to get large, high resolution images from [Unsplash](https://unsplash.com), which
+The first step is to obtain images to run `lbp.py` on. We have implemented a scraper to get large, high resolution images from [Unsplash](https://unsplash.com), which
 provides free images under a [Creative Commons Zero](https://unsplash.com/license) license. Execute the following command in a terminal:
 
-    $ python scraper.py 10
+    $ python scraper.py
 
-The scraper will then download the first 10 images from the Unsplash website. To create a larger dataset, one can simply increase the limit parameter.
-The downloaded images will be stored in the `images` folder in the `lbp.py` root directory. Optionally there is a second parameter to `scraper.py` that
-allows one to change this default folder name.
+The scraper will then download the first 10 images from the Unsplash website. To create a larger dataset, one can simply increase the limit using the `--limit` parameter.
+The downloaded images will be stored in the `images` folder in the `lbp.py` root directory. Optionally there is the `--target` parameter to `scraper.py` that
+allows one to change this default target folder name.
 
 Now that we have a dataset, we can run the local binary patterns algorithm. There are three variants:
 
@@ -57,8 +57,11 @@ split LBP variant on `images/1.jpg` with 8 processes as follows:
 
     $ python main.py images/1.jpg multi-split-lbp 8
 
-Finally we have included the `benchmark.sh` script to get time and memory consumption information when running a command. Prepend `./benchmark.sh` before the
-command to obtain time and memory consumption after the command has terminated.
+Finally we have implemented a benchmark runner in `benchmark.py` to get time and memory consumption information for all possible combinations of algorithms
+and processors. The benchmark runner will export the retrieved data to a JSON file as well as create plots of the data in EPS format. One can start benchmarking
+by running:
+
+    $ python benchmark.py
 
 Installation notes for `huisuil01`
 ==================================

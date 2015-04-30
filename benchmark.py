@@ -78,7 +78,7 @@ def run(algorithm, cores, results):
     process = subprocess.Popen(['/usr/bin/time', '-f', '%e-%S-%U-%M', sys.executable, 'main.py', 'images/1.jpeg', algorithm, str(cores)], stderr=subprocess.PIPE)
     results.append(algorithm, cores, process.stderr)
 
-def main(argv):
+def main():
     results = Results()
     
     cpu_count = multiprocessing.cpu_count()
@@ -105,4 +105,4 @@ def main(argv):
     plot.create()
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()
