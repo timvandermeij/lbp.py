@@ -3,6 +3,8 @@ import multiprocessing
 import subprocess
 import json
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 class Results:
