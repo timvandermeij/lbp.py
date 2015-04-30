@@ -40,22 +40,22 @@ Now that we have a dataset, we can run the local binary patterns algorithm. Ther
 
 `lbp.py` is used to research the impact of multiprocessing on the regular LBP algorithm. All variants have been optimized to make the execution time as low
 as possible. We refer the reader to the commit history for the exact optimizations that have been applied to the initial naive implementations. The regular
-LBP algorithm is essentially a baseline for research. One can run the regular LBP variant on `images/1.jpg` as follows:
+LBP algorithm is essentially a baseline for research. One can run the regular LBP variant on `images/1.jpg` and obtain output as follows:
 
-    $ python main.py images/1.jpg lbp
+    $ python main.py --input images/1.jpg --algorithm lbp --output
 
 The multiprocessing LBP variant works by dividing the input image into _p_ horizontal slices and spawning _p_ processes. Each process gets as input the
 entire image and the bounds of the slice that it should work on. The process applies the regular LBP algorithm on only the assigned slice and returns the
 LBP descriptors. The main process collects the LBP descriptors from each process and merges them to create the final output. One can run the multiprocessing
-LBP variant on `images/1.jpg` with 8 processes as follows:
+LBP variant on `images/1.jpg` with 8 processes and obtain output as follows:
 
-    $ python main.py images/1.jpg multi-lbp 8
+    $ python main.py --input images/1.jpg --algorithm multi-lbp --processes 8 --output
 
 The multiprocessing split LBP variant works the same as the multiprocessing LBP variant with the exception that it does not pass the entire image as input
 for the processes, but rather the exact slice that each process must work on. The idea is to reduce image passing overhead. One can run the multiprocessing
-split LBP variant on `images/1.jpg` with 8 processes as follows:
+split LBP variant on `images/1.jpg` with 8 processes and obtain output as follows:
 
-    $ python main.py images/1.jpg multi-split-lbp 8
+    $ python main.py --input images/1.jpg --algorithm multi-split-lbp --processes 8 --output
 
 Finally we have implemented a benchmark runner in `benchmark.py` to get time and memory consumption information for all possible combinations of algorithms
 and processors. The benchmark runner will export the retrieved data to a JSON file as well as create plots of the data in EPS format. One can start benchmarking
