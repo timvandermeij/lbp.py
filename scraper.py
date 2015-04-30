@@ -3,6 +3,7 @@ import os
 from BeautifulSoup import BeautifulSoup
 import urllib2
 import imghdr
+import argparse
 
 class Scraper:
     MAIN_URL = 'https://unsplash.com'
@@ -59,13 +60,17 @@ class Scraper:
         os.rename('{}.tmp'.format(output_file), '{}.{}'.format(output_file, file_type))
 
 def main(argv):
-    limit = int(argv[0]) if len(argv) > 0 else 10
-    target = argv[1] if len(argv) > 1 else "images"
-   
-    if not os.path.exists(target):
-        os.makedirs(target)
+    # Argument parsing
+    parser = argparse.ArgumentParser(description='Scrape images from Unsplash.com.')
+    parser.add_argument('--limit', dest='limit', type=int, default=10, help='maximum number of images to scrape')
+    parser.add_argument('--target', dest='target', type=str, default='images', help='name of the folder for storing the downloaded images')
+    arguments = parser.parse_args()
 
-    scraper = Scraper(target, limit)
+    # Make sure that the target directory exists
+    if not os.path.exists(arguments.target):
+        os.makedirs(arguments.target)
+
+    scraper = Scraper(arguments.target, arguments.limit)
     scraper.scrape()
 
 if __name__ == "__main__":
