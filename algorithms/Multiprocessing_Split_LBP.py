@@ -4,8 +4,8 @@ from multiprocessing import Process, Queue
 from Multiprocessing_LBP import Multiprocessing_LBP
 
 class Multiprocessing_Split_LBP(Multiprocessing_LBP):
-    def __init__(self, filename, num_processes):
-        Multiprocessing_LBP.__init__(self, filename, num_processes)
+    def __init__(self, input, num_processes, output):
+        Multiprocessing_LBP.__init__(self, input, num_processes, output)
 
     def _process(self, process_id, pixels, queue):
         # Determine the bounds for processing

@@ -2,16 +2,19 @@ import numpy as np
 from PIL import Image
 
 class LBP:
-    def __init__(self, filename, *ignore):
+    def __init__(self, input, num_processes, output):
         # Convert the image to grayscale
-        self.image = Image.open(filename).convert("L")
+        self.image = Image.open(input).convert("L")
         self.width = self.image.size[0]
         self.height = self.image.size[1]
         self.patterns = []
+        self.num_processes = num_processes
+        self.output = output
 
     def execute(self):
         self._process()
-        self._output()
+        if self.output:
+            self._output()
 
     def _process(self):
         pixels = list(self.image.getdata())

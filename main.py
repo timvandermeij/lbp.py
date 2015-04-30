@@ -8,6 +8,7 @@ def main():
     parser.add_argument('--input', dest='input', type=str, default='input.png', help='file name of the input image')
     parser.add_argument('--algorithm', dest='algorithm', type=str, default='lbp', help='algorithm to use: "lbp", "multi-lbp" or "multi-split-lbp"')
     parser.add_argument('--processes', dest='processes', type=int, default=1, help='number of processes to use (only relevant for multiprocessing)')
+    parser.add_argument('--output', dest='output', action='store_true', default=False, help='whether or not an output image should be produced')
     arguments = parser.parse_args()
 
     algorithms = {
@@ -22,7 +23,7 @@ def main():
     algorithm_class = algorithms[arguments.algorithm]
 
     if os.path.isfile(arguments.input):
-        run = algorithm_class(arguments.input, arguments.processes)
+        run = algorithm_class(arguments.input, arguments.processes, arguments.output)
         run.execute()
     else:
         print("File '{}' does not exist.".format(arguments.input))

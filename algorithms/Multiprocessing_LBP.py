@@ -4,13 +4,13 @@ from multiprocessing import Process, Queue
 from LBP import LBP
 
 class Multiprocessing_LBP(LBP):
-    def __init__(self, filename, num_processes):
-        LBP.__init__(self, filename)
-        self.num_processes = num_processes
+    def __init__(self, input, num_processes, output):
+        LBP.__init__(self, input, num_processes, output)
 
     def execute(self):
         self._distribute()
-        self._output()
+        if self.output:
+            self._output()
 
     def _process(self, process_id, pixels, queue):
         # Set the left and right bounds of the segment to process
