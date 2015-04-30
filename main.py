@@ -1,9 +1,8 @@
-import sys
 import os.path
 import argparse
 from algorithms import *
 
-def main(argv):
+def main():
     # Argument parsing
     parser = argparse.ArgumentParser(description='Run the local binary patterns algorithm using either a single process or multiple processes.')
     parser.add_argument('--input', dest='input', type=str, default='input.png', help='file name of the input image')
@@ -29,4 +28,4 @@ def main(argv):
         print("File '{}' does not exist.".format(arguments.input))
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

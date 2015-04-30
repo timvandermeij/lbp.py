@@ -59,7 +59,7 @@ class Scraper:
         file_type = imghdr.what('{}.tmp'.format(output_file))
         os.rename('{}.tmp'.format(output_file), '{}.{}'.format(output_file, file_type))
 
-def main(argv):
+def main():
     # Argument parsing
     parser = argparse.ArgumentParser(description='Scrape images from Unsplash.com.')
     parser.add_argument('--limit', dest='limit', type=int, default=10, help='maximum number of images to scrape')
@@ -74,4 +74,4 @@ def main(argv):
     scraper.scrape()
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()
