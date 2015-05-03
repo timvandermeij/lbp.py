@@ -21,22 +21,20 @@ class Multiprocessing_LBP_MPI(LBP):
             self._run_slave(pixels)
 
     def _run_master(self):
-        # Collect results of the slave processes
-        results = []
-        for process_id in range(1, self.num_processes):
-            while not self.communicator.Iprobe(source=process_id, tag=MPI.ANY_TAG):
-                time.sleep(1)
+        num_processes = self.num_processes - 1
+        results = [0] * num_processes
+        status = MPI.Status()
 
-            results.append({
-                'process_id': process_id,
-                'patterns': self.communicator.recv(source=process_id, tag=MPI.ANY_TAG)
-            })
+        # Collect results of the slave processes
+        while 0 in results:
+            if self.communicator.Iprobe(source=MPI.ANY_SOURCE, tag=MPI.ANY_TAG, status=status):
+                process_id = status.Get_source()
+                results[process_id - 1] = self.communicator.recv(source=process_id, tag=MPI.ANY_TAG)
 
         # Format the pixels correctly for the output function,
         # which expects a linear list of pixel values.
-        results = sorted(results, key=lambda k: k['process_id']) 
         for result in results:
-            self.patterns.extend(result['patterns'])
+            self.patterns.extend(result)
 
     def _run_slave(self, pixels):
         # Exclude the master process from the LBP work
