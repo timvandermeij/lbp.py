@@ -100,6 +100,21 @@ Compile Python (version 2.7.9) from source:
     $ rm Python-2.7.9.tgz
     $ rm -r Python-2.7.9
 
+OpenMPI
+-------
+
+Compile OpenMPI from source:
+
+    $ wget http://www.open-mpi.org/software/ompi/v1.8/downloads/openmpi-1.8.4.tar.gz
+    $ tar xzvf openmpi-1.8.4.tar.gz
+    $ cd openmpi-1.8.4
+    $ ./configure --prefix=/scratch/{username}/openmpi
+    $ make
+    $ make install
+    $ cd ..
+    $ rm openmpi-1.8.4.tar.gz
+    $ rm -r openmpi-1.8.4
+
 Virtualenv
 ----------
 
@@ -107,12 +122,25 @@ Virtualenv
 
     $ virtualenv -p /scratch/{username}/python/bin/python lbp
 
-Packages
---------
+Update `~/.bashrc`
+------------------
+
+Append the following fragment to `~/.bashrc`. Do not forget to replace `{username}`.
+
+    export SCRATCH="/scratch/{username}"
+    alias activate="source $SCRATCH/lbp/bin/activate"
+    export PATH="$PATH:$SCRATCH/openmpi/bin:$SCRATCH/openmpi/lib"
+    export LIBRARY_PATH="$SCRATCH/openmpi/lib"
+    export LD_LIBRARY_PATH="$SCRATCH/openmpi/lib"
+    export CPATH="$SCRATCH/openmpi/include"
+    export PKG_CONFIG_PATH="$SCRATCH/openmpi/lib/pkgconfig"
+
+Python packages
+---------------
 
 Activate the virtual environment:
 
-    $ source lbp/bin/activate
+    $ activate
 
 Update `pip` to the most recent version:
 
