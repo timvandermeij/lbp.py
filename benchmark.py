@@ -12,7 +12,8 @@ class Results:
         self.results = {
             'lbp': [],
             'multi-lbp': [],
-            'multi-split-lbp': []
+            'multi-split-lbp': [],
+            'multi-lbp-mpi': []
         }
 
     def get(self):
@@ -77,14 +78,25 @@ class Plot:
             self._create(memory, algorithm, runs, 'Peak memory usage (MB)', 'benchmark_plot_{}_memory.eps'.format(algorithm))
 
 def run(algorithm, cores, results):
-    process = subprocess.Popen(
-        [
-            '/usr/bin/time',
-            '-f', '%e-%S-%U-%M',
-            sys.executable, 'main.py', '--input', 'images/1.jpeg', '--algorithm', algorithm, '--processes', str(cores)
-        ],
-        stderr=subprocess.PIPE
-    )
+    if algorithm == "multi-lbp-mpi":
+        process = subprocess.Popen(
+            [
+                '/usr/bin/time',
+                '-f', '%e-%S-%U-%M',
+                'mpirun', '-np', str(cores + 1), sys.executable, 'main.py', '--input', 'images/1.jpeg', '--algorithm', algorithm, '--processes', str(cores)
+            ],
+            stderr=subprocess.PIPE
+        )
+    else:
+        process = subprocess.Popen(
+            [
+                '/usr/bin/time',
+                '-f', '%e-%S-%U-%M',
+                sys.executable, 'main.py', '--input', 'images/1.jpeg', '--algorithm', algorithm, '--processes', str(cores)
+            ],
+            stderr=subprocess.PIPE
+        )
+    
     results.append(algorithm, cores, process.stderr)
 
 def main():
@@ -101,9 +113,13 @@ def main():
         print("Benchmarking multiprocessing LBP with {} cores...".format(cores))
         run("multi-lbp", cores, results)
 
-        # Multiprocessing LBP
+        # Multiprocessing split LBP
         print("Benchmarking multiprocessing split LBP with {} cores...".format(cores))
         run("multi-split-lbp", cores, results)
+
+        # Multiprocessing LBP (MPI)
+        print("Benchmarking multiprocessing LBP (MPI) with {} cores...".format(cores))
+        run("multi-lbp-mpi", cores, results)
 
     print("Writing results JSON...")
     with open('benchmark_results.json', 'w') as output:

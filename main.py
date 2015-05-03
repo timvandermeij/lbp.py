@@ -14,6 +14,7 @@ def main():
     algorithms = {
         "lbp": LBP.LBP,
         "multi-lbp": Multiprocessing_LBP.Multiprocessing_LBP,
+        "multi-lbp-mpi": Multiprocessing_LBP_MPI.Multiprocessing_LBP_MPI,
         "multi-split-lbp": Multiprocessing_Split_LBP.Multiprocessing_Split_LBP
     }
     if arguments.algorithm not in algorithms:

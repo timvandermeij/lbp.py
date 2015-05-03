@@ -11,6 +11,8 @@ The versions indicated below have been verified. Other versions are also likely 
   * Pillow 2.7.0
   * BeautifulSoup 3.2.1
   * Matplotlib 1.4.3
+  * mpi4py 1.3.1
+* OpenMPI 1.8.4
 
 Cloning the repository
 ======================
@@ -32,11 +34,12 @@ The scraper will then download the first 10 images from the Unsplash website. To
 The downloaded images will be stored in the `images` folder in the `lbp.py` root directory. Optionally there is the `--target` parameter to `scraper.py` that
 allows one to change this default target folder name.
 
-Now that we have a dataset, we can run the local binary patterns algorithm. There are three variants:
+Now that we have a dataset, we can run the local binary patterns algorithm. There are four variants:
 
 * Regular LBP: the local binary patterns algorithm with neighborhood radius 1
 * Multiprocessing LBP: divides the work of regular LBP over multiple processes and passes the entire image to each process
 * Multiprocessing split LBP: divides the work of regular LBP over multiple processes and passes only the working range to each process
+* Multiprocessing LBP (MPI): equal to multiprocessing LBP, but uses OpenMPI instead of Python's multiprocessing package
 
 `lbp.py` is used to research the impact of multiprocessing on the regular LBP algorithm. All variants have been optimized to make the execution time as low
 as possible. We refer the reader to the commit history for the exact optimizations that have been applied to the initial naive implementations. The regular
@@ -56,6 +59,15 @@ for the processes, but rather the exact slice that each process must work on. Th
 split LBP variant on `images/1.jpg` with 8 processes and obtain output as follows:
 
     $ python main.py --input images/1.jpg --algorithm multi-split-lbp --processes 8 --output
+
+The multiprocessing LBP (MPI) variant works the same as the multiprocessing LBP variant with the exception that is uses OpenMPI to manage the processes instead
+of using Python's multiprocessing package. This has been implemented to check if there is a difference in speed or communication overhead. One can run this
+variant on `images/1.jpg` with 8 processes and obtain output as follows (we assume that OpenMPI has been installed):
+
+    $ mpirun -np 9 python main.py --input images/3.png --algorithm multi-lbp-mpi --output
+
+Note that for this algorithm the `--processes` flag is ignored because it is taken care of by OpenMPI. We let OpenMPI create 9 processes instead of 8 because
+we want to add one master process that collects the results from the slave processes and that takes care of the final output.
 
 Finally we have implemented a benchmark runner in `benchmark.py` to get time and memory consumption information for all possible combinations of algorithms
 and processors. The benchmark runner will export the retrieved data to a JSON file as well as create plots of the data in EPS format. One can start benchmarking
@@ -115,6 +127,7 @@ Then install the following dependencies:
     (lbp)$ pip install beautifulsoup
     (lbp)$ pip install distribute --upgrade
     (lbp)$ pip install matplotlib
+    (lbp)$ pip install mpi4py
 
 Now we can run `lbp.py` using the steps described above when we have activated the virtual environment.
 
