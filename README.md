@@ -5,7 +5,7 @@ Prerequisites
 
 The versions indicated below have been verified. Other versions are also likely to work, but that has not been verified.
 
-* Git 2.3.7
+* Git 2.3.\* or 2.4.\*
 * Python 2.7.9 with the following packages:
   * NumPy 1.9.2
   * Pillow 2.7.0
